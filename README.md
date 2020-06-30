@@ -31,7 +31,7 @@ and
 
 You should be able to see the GraphQL schema at [http://localhost:5002/graphiql](http://localhost:5002/graphiql)
 
-You should also see a login page at [http://localhost:300/](http://localhost:300/).  You can log in with the username `demo@logistimatics.com` and password `demo`.
+You should also see a login page at [http://localhost:3000/](http://localhost:3000/).  You can log in with the username `demo@logistimatics.com` and password `demo`.
 
 Once logged in, you should see the location of one GPS tracker. The JWT login token can be fetched via `localStorage.getItem('token')`.  You can set the Authorization header in GraphIQL to `Bearer _token_here_` to play with the API.
 
