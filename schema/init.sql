@@ -33,7 +33,7 @@ end $$;
 grant logistimatics_user to logistimatics_postgraphql;
 
 -- Access control on logistimatics schema
-grant usage on schema logistimatics to logistimatics_anonymous, logistimatics_user;
+grant usage on schema logistimatics to logistimatics_postgraphql, logistimatics_anonymous, logistimatics_user;
 grant usage on schema logistimatics_private to logistimatics_postgraphql;
 
 create type logistimatics.jwt_token as (
@@ -55,7 +55,7 @@ create table logistimatics_private.user_account (
 
 grant select on table logistimatics_private.user_account to logistimatics_postgraphql;
 
-grant select on table logistimatics.user to logistimatics_user;
+grant select on table logistimatics.user to logistimatics_postgraphql, logistimatics_user;
 grant update (name, email) on table logistimatics.user to logistimatics_user;
 
 alter table logistimatics.user enable row level security;
