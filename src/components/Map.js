@@ -9,6 +9,7 @@ import {
   LayerGroup,
   Tooltip,
   ScaleControl,
+  Polyline,
   ZoomControl,
 } from 'react-leaflet';
 import L, {
@@ -22,19 +23,20 @@ export default class ReactMap extends Component {
   static getDerivedStateFromProps(props, state) {
     const bounds = latLngBounds([]);
     const devices = get(props, ['devices']) || [];
+    console.log('props', props)
 
     devices.forEach(function (device) {
       const lat = get(device, ['positionsByDeviceId', 'nodes', 0, 'latitude']);
       const lng = get(device, ['positionsByDeviceId', 'nodes', 0, 'longitude']);
 
-      if(lat || lng) {
+      if (lat || lng) {
         bounds.extend({ lat, lng });
         bounds.extend({ lat: lat + 0.001, lng: lng + 0.001 });
         bounds.extend({ lat: lat - 0.001, lng: lng - 0.001 });
       }
     });
 
-    if(!bounds.isValid()) {
+    if (!bounds.isValid()) {
       // continental us
       bounds.extend(L.latLngBounds({ lat: 50, lng: -130 }, { lat: 20, lng: -60 }));
     }
@@ -46,37 +48,44 @@ export default class ReactMap extends Component {
     satellite: (localStorage.getItem(LAYER_KEY) === 'Satellite'),
     "Show current location": !(localStorage.getItem("Show current location") === 'false'),
     bounds: null,
+    selectedDate: moment('06/21/2020').startOf("D"),
   };
 
   renderDevice = (device) => {
+    const { selectedDate } = this.state;
     const { id, name, batteryPercentage } = device;
     const lat = get(device, ['positionsByDeviceId', 'nodes', 0, 'latitude']);
     const lng = get(device, ['positionsByDeviceId', 'nodes', 0, 'longitude']);
     const address = get(device, ['positionsByDeviceId', 'nodes', 0, 'address']);
     const positionAt = get(device, ['positionsByDeviceId', 'nodes', 0, 'positionAt']);
 
-    if(lat || lng) {
+    const start = moment(selectedDate).startOf("D");
+    const end = moment(selectedDate).endOf("D");
+    if (lat || lng) {
       return (
-        <Marker
-          key={`${id}`}
-          iconSize={100}
-          position={latLng({ lat, lng })}>
-          <Tooltip
-            permanent={true}
-            direction="top"
-            maxWidth={240}
-            autoPan={false}
-            closeButton={false}
-            autoClose={false}
-            closeOnClick={false}
-            interactive={true}>
-            <div>
-              <div><b>{name || 'Unknown device'}</b> {`(${Math.round(batteryPercentage)}%)`}</div>
-              {address ? <div className="small"><a href={`https://maps.google.com/maps?q=${lat},${lng}`}>{address}</a></div> : null}
-              {positionAt ? <div className="small">Updated: {moment(positionAt).format('ddd MMM D, h:mma')}</div> : null}
-            </div>
-          </Tooltip>
-        </Marker>
+        <>
+          {/* Insert Device Track */}
+          <Marker
+            key={`${id}`}
+            iconSize={100}
+            position={latLng({ lat, lng })}>
+            <Tooltip
+              permanent={true}
+              direction="top"
+              maxWidth={240}
+              autoPan={false}
+              closeButton={false}
+              autoClose={false}
+              closeOnClick={false}
+              interactive={true}>
+              <div>
+                <div><b>{name || 'Unknown device'}</b> {`(${Math.round(batteryPercentage)}%)`}</div>
+                {address ? <div className="small"><a href={`https://maps.google.com/maps?q=${lat},${lng}`}>{address}</a></div> : null}
+                {positionAt ? <div className="small">Updated: {moment(positionAt).format('ddd MMM D, h:mma')}</div> : null}
+              </div>
+            </Tooltip>
+          </Marker>
+        </>
       );
     } else {
       return null;
@@ -103,12 +112,12 @@ export default class ReactMap extends Component {
           this.setState({ [e.name]: false });
           localStorage.setItem(e.name, 'false');
         }}
-        maxZoom={20}
+        maxZoom={16}
         zoomControl={false}
         style={{ minHeight: 800, width: '100%' }}>
         <ScaleControl position="bottomleft" />
         <ZoomControl position="topright" />
-        <LayersControl position="topleft" sortLayers={true} sortFunction={function(layerA, layerB, nameA, nameB) {
+        <LayersControl position="topleft" sortLayers={true} sortFunction={function (layerA, layerB, nameA, nameB) {
           const order = ["Map", "Satellite", "Show current location"];
           const idxA = order.indexOf(nameA), idxB = order.indexOf(nameB);
 
@@ -127,7 +136,7 @@ export default class ReactMap extends Component {
             <TileLayer
               url="https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
               maxZoom={20}
-              subdomains={['mt0','mt1','mt2','mt3']}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
             />
           </LayersControl.BaseLayer>
           {(devices || []).length > 0 ?
