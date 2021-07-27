@@ -30,7 +30,7 @@ app.use(
     },
     jwtSecret: JWT_SECRET,
     jwtPgTypeIdentifier: 'logistimatics.jwt_token',
-}));
+  }));
 
 User.initialize(app);
 

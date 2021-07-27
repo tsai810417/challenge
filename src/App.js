@@ -12,12 +12,14 @@ class App extends Component {
   updateUserToken = (userToken, redirect) => {
     setToken(userToken);
 
-    if(!userToken) {
+    if (!userToken) {
       window.location = '/login';
     } else {
       window.location = redirect || '/';
     }
   }
+
+  followOnIg = (user) => console.log('user', user)
 
   handleLogin = (token, redirect) => {
     this.updateUserToken(token, redirect);
@@ -35,7 +37,7 @@ class App extends Component {
     };
 
     return (
-      <div style={{padding: 0, margin: 0}} className="App">
+      <div style={{ padding: 0, margin: 0 }} className="App">
         <Navbar
           me={get(this.props, ['data', 'me'])}
           handleLogout={this.handleLogout}

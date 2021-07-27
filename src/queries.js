@@ -25,8 +25,6 @@ export const DEVICE_LOCATIONS = gql`
             id
             positionAt
             address
-            latitude
-            longitude
           }
         }
       }

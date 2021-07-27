@@ -8,7 +8,7 @@ import {
 import LoaderButton from './LoaderButton';
 import Error from './Error';
 import { SERVER } from '../config';
-
+import ReactDatePicker from 'react-datepicker';
 class Login extends Component {
   state = {
     isLoading: false,
@@ -35,7 +35,7 @@ class Login extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({[e.target.id]:e.target.value});
+    this.setState({ [e.target.id]: e.target.value });
   };
 
   handleSubmit = (e) => {
@@ -43,8 +43,8 @@ class Login extends Component {
 
     this.setState({ isLoading: true });
     this.login(this.state.username, this.state.password)
-      .then(({token}) => this.props.handleLogin(token, '/devices'))
-      .catch(error => this.setState({isLoading: false, error}));
+      .then(({ token }) => this.props.handleLogin(token, '/devices'))
+      .catch(error => this.setState({ isLoading: false, error }));
   };
 
   render() {
@@ -69,7 +69,7 @@ class Login extends Component {
         </FormGroup>
         <Error
           error={this.state.error}
-          onDismiss={() => this.setState({ error:null })} />
+          onDismiss={() => this.setState({ error: null })} />
         <LoaderButton
           block
           color="primary"
