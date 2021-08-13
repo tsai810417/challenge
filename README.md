@@ -44,4 +44,4 @@ Once logged in, you should see the location of one GPS tracker. The JWT login to
 
 ## Wrapping up
 
-Please submit a pull request to the repository on GitHub and let us know you're finished.
+Please email ricardo@gpx.co with a link to your cloned repo when you finish
