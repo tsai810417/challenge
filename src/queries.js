@@ -24,6 +24,8 @@ export const DEVICE_LOCATIONS = gql`
           nodes {
             id
             positionAt
+            latitude
+            longitude
             address
           }
         }
