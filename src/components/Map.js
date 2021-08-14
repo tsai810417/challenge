@@ -9,13 +9,14 @@ import {
   LayerGroup,
   Tooltip,
   ScaleControl,
-  Polyline,
   ZoomControl,
 } from 'react-leaflet';
 import L, {
   latLng,
   latLngBounds,
 } from 'leaflet';
+import AntPath from "react-leaflet-ant-path";
+import { Link } from 'react-router-dom';
 
 const LAYER_KEY = 'map-layer';
 
@@ -23,7 +24,7 @@ export default class ReactMap extends Component {
   static getDerivedStateFromProps(props, state) {
     const bounds = latLngBounds([]);
     const devices = get(props, ['devices']) || [];
-    console.log('props', props)
+    const path = get(props, ['path'], []);
 
     devices.forEach(function (device) {
       const lat = get(device, ['positionsByDeviceId', 'nodes', 0, 'latitude']);
@@ -35,6 +36,12 @@ export default class ReactMap extends Component {
         bounds.extend({ lat: lat - 0.001, lng: lng - 0.001 });
       }
     });
+
+    path.forEach(el => {
+      bounds.extend({ lat: el.latitude, lng: el.longitude });
+      bounds.extend({ lat: el.latitude + 0.001, lng: el.longitude + 0.001 });
+      bounds.extend({ lat: el.latitude - 0.001, lng: el.longitude - 0.001 });
+    })
 
     if (!bounds.isValid()) {
       // continental us
@@ -48,19 +55,15 @@ export default class ReactMap extends Component {
     satellite: (localStorage.getItem(LAYER_KEY) === 'Satellite'),
     "Show current location": !(localStorage.getItem("Show current location") === 'false'),
     bounds: null,
-    selectedDate: moment('06/21/2020').startOf("D"),
   };
 
   renderDevice = (device) => {
-    const { selectedDate } = this.state;
     const { id, name, batteryPercentage } = device;
     const lat = get(device, ['positionsByDeviceId', 'nodes', 0, 'latitude']);
     const lng = get(device, ['positionsByDeviceId', 'nodes', 0, 'longitude']);
     const address = get(device, ['positionsByDeviceId', 'nodes', 0, 'address']);
     const positionAt = get(device, ['positionsByDeviceId', 'nodes', 0, 'positionAt']);
 
-    const start = moment(selectedDate).startOf("D");
-    const end = moment(selectedDate).endOf("D");
     if (lat || lng) {
       return (
         <>
@@ -82,6 +85,9 @@ export default class ReactMap extends Component {
                 <div><b>{name || 'Unknown device'}</b> {`(${Math.round(batteryPercentage)}%)`}</div>
                 {address ? <div className="small"><a href={`https://maps.google.com/maps?q=${lat},${lng}`}>{address}</a></div> : null}
                 {positionAt ? <div className="small">Updated: {moment(positionAt).format('ddd MMM D, h:mma')}</div> : null}
+                <Link to={`/devices/${id}`}>
+                  Show more!
+                </Link>
               </div>
             </Tooltip>
           </Marker>
@@ -93,8 +99,9 @@ export default class ReactMap extends Component {
   };
 
   render() {
-    const { devices } = this.props;
+    const { devices, path } = this.props;
     const { bounds } = this.state;
+    const positions = path ? path.map(el => latLng({lat: el.latitude, lng: el.longitude})) : null;
 
     return (
       <LeafletMap
@@ -145,6 +152,13 @@ export default class ReactMap extends Component {
                 {(devices || []).map(this.renderDevice)}
               </LayerGroup>
             </LayersControl.Overlay> : null}
+          {path ? 
+          <LayersControl.Overlay name="Show paths" checked={true}>
+            <LayerGroup>
+              <AntPath positions={positions} options={{ delay: 1000, reverse: false }}/>
+            </LayerGroup>
+          </LayersControl.Overlay>
+          : null}
         </LayersControl>
       </LeafletMap>
     );
