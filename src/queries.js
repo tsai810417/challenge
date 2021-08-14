@@ -35,3 +35,17 @@ export const DEVICE_LOCATIONS = gql`
 `;
 
 export const withDeviceLocations = graphql(DEVICE_LOCATIONS);
+
+export const DEVICE_POSITIONS = gql`
+  query MyQuery($deviceId: Int!) {
+    allPositions(condition: {deviceId: $deviceId}, orderBy: POSITION_AT_ASC) {
+      nodes {
+        latitude
+        longitude
+        positionAt
+      }
+    }
+}
+`;
+
+export const withDevicePositions = graphql(DEVICE_POSITIONS);
