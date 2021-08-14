@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import get from 'lodash.get';
 import { withDeviceLocations } from '../queries';
 import Map from '../components/Map';
-import ReactDatePicker from 'react-datepicker';
 
 import "react-datepicker/dist/react-datepicker.css";
+import { Link } from 'react-router-dom';
 
 const SuperDevice = (props) => (
   <div className="container">
@@ -20,14 +20,22 @@ const SuperDevice = (props) => (
 );
 
 const Devices = (props) => {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const devices = get(props, ['data', 'allDevices', 'nodes'], []);
+
   return (
-    <div className="container">
-      <div style={{ marginBottom: 300 }}>
-        <ReactDatePicker selected={selectedDate} onChange={(date) => setSelectedDate(date)} />
-      </div>
+    <div>
+      <h1>List of Devices</h1>
+      <ul>
+        {devices.map(device => (
+          <li key={device.id}>
+            <Link to={`/devices/${device.id}`}>
+              {device.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
       <div className="col-12">
-        <Map devices={get(props, ['data', 'allDevices', 'nodes'], [])} />
+        <Map devices={devices} />
       </div>
     </div>
   );
